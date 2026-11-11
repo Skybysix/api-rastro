@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { listingsCollection } from "../db";
 import { ObjectId } from "mongodb";
+import type { Filter } from "mongodb";
+import type { Listing } from "../types";
 
 const router = Router();
 
@@ -14,9 +16,28 @@ const LIST_FIELDS = {
 };
 
 // GET /api/listings (listado)
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
+  const filter: Filter<Listing> = {};
+
+  if (typeof req.query.category === "string") {
+    filter.category = req.query.category;
+  }
+  if (typeof req.query.city === "string") {
+    filter.city = req.query.city;
+  }
+  if (typeof req.query.maxPrice === "string") {
+    const maxPrice = Number(req.query.maxPrice);
+
+    if (Number.isNaN(maxPrice)) {
+      res.status(400).json({ error: "maxPrice debe ser un número" });
+      return;
+    }
+
+    filter.price = { $lte: maxPrice };
+  }
+
   const listings = await listingsCollection()
-    .find()
+    .find(filter)
     .project(LIST_FIELDS)
     .sort({ publishedAt: -1 })
     .toArray();
