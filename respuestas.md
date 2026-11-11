@@ -22,4 +22,8 @@ error: failed to push some refs to 'https://github.com/Skybysix/api-rastro.git'
 
 2. ¿por qué la segunda no encuentra nada? Pista: ¿en qué formato llega todo lo que viene en una URL?
 
-Porque los valores de la URL llegan como texto, pero el precio en MongoDB está guardado como número
+Porque los valores de la URL llegan como texto, pero el precio en MongoDB está guardado como número.
+
+3. ¿por qué la API ignora views y status si el cliente los envía? ¿Qué podría hacer alguien si no los ignorara?
+
+Porque son campos que controla la API. Si no los ignorase, un usuario podría falsear las visitas o marcar un anuncio como vendido sin estarlo.

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listingsCollection } from "../db";
+import { listingsCollection, usersCollection } from "../db";
 import { ObjectId } from "mongodb";
 import type { Filter } from "mongodb";
 import type { Listing } from "../types";
@@ -68,6 +68,61 @@ router.get("/:id", async (req, res) => {
   }
 
   res.json(listing);
+});
+// POST /api/listings (publicar anuncio)
+router.post("/", async (req, res) => {
+  const body = req.body;
+  if (
+    typeof body.title !== "string" ||
+    body.title.trim() === "" ||
+    typeof body.description !== "string" ||
+    body.description.trim() === "" ||
+    typeof body.category !== "string" ||
+    body.category.trim() === "" ||
+    typeof body.city !== "string" ||
+    body.city.trim() === ""
+  ) {
+    res.status(400).json({ error: "Faltan campos de texto obligatorios" });
+    return;
+  }
+  if (typeof body.price !== "number" || body.price < 0) {
+    res.status(400).json({ error: "price debe ser un número mayor o igual que 0" });
+    return;
+  }
+  if (typeof body.sellerId !== "string" || !ObjectId.isValid(body.sellerId)) {
+    res.status(400).json({ error: "sellerId no tiene un formato válido" });
+    return;
+  }
+  const seller = await usersCollection().findOne({
+    _id: new ObjectId(body.sellerId),
+  });
+
+  if (!seller) {
+    res.status(400).json({ error: "No existe ningún usuario con ese sellerId" });
+    return;
+  }
+  const newListing: Listing = {
+    title: body.title.trim(),
+    description: body.description.trim(),
+    price: body.price,
+    category: body.category.trim(),
+    status: "AVAILABLE",
+    city: body.city.trim(),
+    publishedAt: new Date(),
+    views: 0,
+    seller: {
+      id: seller._id,
+      name: seller.name,
+    },
+    photos: [],
+    attributes: body.attributes ?? {},
+  };
+  const result = await listingsCollection().insertOne(newListing);
+
+  res.status(201).json({
+    _id: result.insertedId,
+    ...newListing,
+  });
 });
 
 export default router;
