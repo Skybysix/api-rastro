@@ -1,5 +1,4 @@
 ## Ejercicio 0
-1\.
 1. Al intentar hacer push directamente a main, GitHub lo rechaza porque los cambios deben hacerse mediante una Pull Request:
 
 Enumerating objects: 7, done.
@@ -19,3 +18,8 @@ remote:
 To https://github.com/Skybysix/api-rastro.git
  ! [remote rejected] main -> main (push declined due to repository rule violations)
 error: failed to push some refs to 'https://github.com/Skybysix/api-rastro.git'
+
+
+2. ¿por qué la segunda no encuentra nada? Pista: ¿en qué formato llega todo lo que viene en una URL?
+
+Porque los valores de la URL llegan como texto, pero el precio en MongoDB está guardado como número
