@@ -2,6 +2,7 @@
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
 import { connectDb, getDb } from "./db";
+import listingsRouter from "./routes/listings";
 
 const app = express();
 const PORT = 3000;
@@ -21,7 +22,7 @@ app.get("/api/health", async (_req, res) => {
   res.json({ status: "ok", db: getDb().databaseName });
 });
 
-// (aquí irán los routers de las próximas partes)
+app.use("/api/listings", listingsRouter);
 
 // 4. Ninguna ruta ha respondido: 404
 app.use((req, res) => {
