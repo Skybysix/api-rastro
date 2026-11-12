@@ -27,3 +27,7 @@ Porque los valores de la URL llegan como texto, pero el precio en MongoDB está 
 3. ¿por qué la API ignora views y status si el cliente los envía? ¿Qué podría hacer alguien si no los ignorara?
 
 Porque son campos que controla la API. Si no los ignorase, un usuario podría falsear las visitas o marcar un anuncio como vendido sin estarlo.
+
+4. Ana baja el iPhone de 380 a 350 €. La oferta de Sara guarda una copia: listing.price: 380. ¿Debe tu PATCH cambiar también esa copia? ¿Por qué?
+
+No. El PATCH solo debe modificar el precio del anuncio en la colección listings. La oferta guarda una copia independiente de los datos del anuncio, por lo que mantiene los 380 € originales.
