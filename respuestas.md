@@ -31,3 +31,33 @@ Porque son campos que controla la API. Si no los ignorase, un usuario podría fa
 4. Ana baja el iPhone de 380 a 350 €. La oferta de Sara guarda una copia: listing.price: 380. ¿Debe tu PATCH cambiar también esa copia? ¿Por qué?
 
 No. El PATCH solo debe modificar el precio del anuncio en la colección listings. La oferta guarda una copia independiente de los datos del anuncio, por lo que mantiene los 380 € originales.
+
+5. ¿por qué ofertar por un anuncio vendido es 409 y no 400?
+
+Devuelve 409 porque hemos creado esta línea de cógigo:
+
+// 5. Comprobar que el anuncio está disponible
+  if (listing.status !== "AVAILABLE") {
+    res.status(409).json({ error: "El anuncio no está disponible" });
+    return;
+  }
+
+Necesitamos esa respuesta porque en este caso el método que usamos y el body que pusimos era correcto, el único error era que el anuncio ya no estaba disponible. Es decir, la petición y el formato de petición era correcto, por eso es buena práctica devolver un 409 y no un 400.
+
+6. 
+
+MongoDB se encarga de almacenar objetos, generar el id automáticamente si no se pone de forma manual y revisar si este es válido. 
+
+Con el código, en cambio, realizamos validaciones, peticiones HTTP y devolvemos códigos de error (400) o de petición realizada (200), entre otras.
+
+Ejemplo MongoDB:
+
+await offersCollection().insertOne(newOffer);
+
+    Mongo inserta automáticamente un id si no lo ponemos nosotros y verifica que no se duplique con otro.
+
+Ejemplo código:
+
+if (typeof amount !== "number" || amount <= 0)
+
+    Comprobar que el precio sea igual o mayor a 0.
