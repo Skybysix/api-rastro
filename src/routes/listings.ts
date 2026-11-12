@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listingsCollection, usersCollection } from "../db";
+import { listingsCollection, usersCollection, offersCollection } from "../db";
 import { ObjectId } from "mongodb";
 import type { Filter } from "mongodb";
 import type { Listing } from "../types";
@@ -69,6 +69,32 @@ router.get("/:id", async (req, res) => {
 
   res.json(listing);
 });
+
+// GET /api/listings/:id/offers (consultar ofertas de un anuncio)
+router.get("/:id/offers", async (req, res) => {
+  const { id } = req.params;
+
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ error: "ID de anuncio no válido" });
+    return;
+  }
+
+  const listing = await listingsCollection().findOne({
+    _id: new ObjectId(id),
+  });
+
+  if (!listing) {
+    res.status(404).json({ error: "Anuncio no encontrado" });
+    return;
+  }
+
+  const offers = await offersCollection()
+    .find({ "listing.id": new ObjectId(id) })
+    .toArray();
+
+  res.json(offers);
+});
+
 // POST /api/listings (publicar anuncio)
 router.post("/", async (req, res) => {
   const body = req.body;
