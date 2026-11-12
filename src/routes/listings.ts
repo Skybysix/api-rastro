@@ -125,4 +125,63 @@ router.post("/", async (req, res) => {
   });
 });
 
+// PATCH /api/listings/:id (cambiar precio)
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { price } = req.body;
+
+  // Comprobar que el ID es válido
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ error: "ID de anuncio no válido" });
+    return;
+  }
+
+  // Comprobar que el precio es un número mayor o igual que 0
+  if (typeof price !== "number" || price < 0) {
+    res.status(400).json({
+      error: "price debe ser un número mayor o igual que 0",
+    });
+    return;
+  }
+
+  // Actualizar únicamente el precio
+  const listing = await listingsCollection().findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: { price } },
+    { returnDocument: "after" },
+  );
+
+  // Comprobar que el anuncio existe
+  if (!listing) {
+    res.status(404).json({ error: "Anuncio no encontrado" });
+    return;
+  }
+
+  res.json(listing);
+});
+
+// DELETE /api/listings/:id (borrar anuncio)
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  // Comprobar que el ID es válido
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ error: "ID de anuncio no válido" });
+    return;
+  }
+
+  // Eliminar el anuncio
+  const result = await listingsCollection().deleteOne({
+    _id: new ObjectId(id),
+  });
+
+  // Comprobar si existía
+  if (result.deletedCount === 0) {
+    res.status(404).json({ error: "Anuncio no encontrado" });
+    return;
+  }
+
+  res.status(204).send();
+});
+
 export default router;
